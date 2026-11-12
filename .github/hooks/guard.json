@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "node .github/hooks/guard.cjs",
+        "powershell": "node .github/hooks/guard.cjs",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

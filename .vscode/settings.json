@@ -1,0 +1,10 @@
+{
+  "chat.useHooks": true,
+  "chat.tools.terminal.autoApprove": {
+    "/^git (status|diff|log|show|switch|add)\\b/": true,
+    "/^git branch --show-current$/": true,
+    "/^git commit\\b/": true,
+    "/^git (push|merge|rebase|reset|checkout|clean)\\b/": false,
+    "/^rm\\b/": false
+  }
+}

@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Git Commands for the Feature Workflow</title>
+    <style>
+      :root {
+        --ink: #172742;
+        --muted: #5d6980;
+        --line: #d7dfeb;
+        --paper: #ffffff;
+        --canvas: #f5f7fb;
+        --blue: #2457a6;
+        --blue-dark: #193e78;
+        --blue-pale: #e7effc;
+        --green: #28714d;
+        --green-pale: #e6f4eb;
+        --amber: #a95218;
+        --amber-pale: #fbeddc;
+        --red: #a93c3c;
+        --red-pale: #fbe9e9;
+        --code: #182b47;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      main {
+        width: min(1100px, calc(100% - 40px));
+        margin: 56px auto 80px;
+      }
+
+      header {
+        position: relative;
+        overflow: hidden;
+        padding: 54px 58px 56px;
+        color: white;
+        background: var(--ink);
+        border-radius: 8px 8px 0 0;
+      }
+
+      header::after {
+        position: absolute;
+        right: -56px;
+        bottom: -110px;
+        width: 310px;
+        height: 310px;
+        border: 46px solid #4774bb;
+        border-radius: 50%;
+        content: "";
+        opacity: 0.3;
+      }
+
+      .eyebrow {
+        position: relative;
+        z-index: 1;
+        margin: 0 0 16px;
+        color: #b9d1f6;
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.15;
+      }
+
+      h1 {
+        position: relative;
+        z-index: 1;
+        max-width: 720px;
+        margin: 0;
+        letter-spacing: -0.035em;
+        font-size: clamp(2.5rem, 5.2vw, 4.6rem);
+      }
+
+      header p:last-child {
+        position: relative;
+        z-index: 1;
+        max-width: 680px;
+        margin: 24px 0 0;
+        color: #d7e5fa;
+        font-size: 1.08rem;
+      }
+
+      section {
+        position: relative;
+        margin-top: 0;
+        padding: 42px 52px 44px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-top: 0;
+      }
+
+      section::before {
+        position: absolute;
+        top: 45px;
+        left: 0;
+        width: 4px;
+        height: 32px;
+        background: var(--blue);
+        content: "";
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        letter-spacing: -0.02em;
+        font-size: 1.8rem;
+      }
+
+      h3 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+      }
+
+      .intro {
+        max-width: 780px;
+        margin: 0 0 30px;
+        color: var(--muted);
+        font-size: 1.02rem;
+      }
+
+      .feature-delivery {
+        background:
+          linear-gradient(135deg, #ffffff 0%, #ffffff 62%, #f4f7fd 100%);
+      }
+
+      .feature-delivery .intro {
+        max-width: 720px;
+      }
+
+      .feature-delivery .workflow {
+        position: relative;
+        margin: 14px 0;
+      }
+
+      .feature-delivery .workflow + .workflow {
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 1px dashed #b9c9e2;
+      }
+
+      .feature-delivery .step {
+        min-height: 104px;
+        padding: 18px 20px;
+        border: 1px solid transparent;
+        border-left-width: 5px;
+        box-shadow: 0 5px 12px rgb(23 39 66 / 7%);
+        font-size: 1rem;
+      }
+
+      .feature-delivery .step small {
+        margin-top: 7px;
+        font-size: 0.88rem;
+      }
+
+      .feature-delivery .step.prepare {
+        border-color: #b8cef2;
+        border-left-color: var(--blue);
+      }
+
+      .feature-delivery .step.build {
+        border-color: #f0c99a;
+        border-left-color: var(--amber);
+      }
+
+      .feature-delivery .step.review {
+        border-color: #d3c7f5;
+        border-left-color: #6d4fc5;
+      }
+
+      .feature-delivery .step.publish {
+        border-color: #b8dfc7;
+        border-left-color: var(--green);
+      }
+
+      .feature-delivery .arrow {
+        position: relative;
+        color: var(--blue-dark);
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: 1fr 32px 1fr 32px 1fr;
+        align-items: center;
+        gap: 10px;
+        margin: 12px 0;
+      }
+
+      .step {
+        min-height: 86px;
+        padding: 17px 18px;
+        border-radius: 6px;
+        text-align: left;
+        font-size: 0.94rem;
+        font-weight: 800;
+      }
+
+      .step small {
+        display: block;
+        margin-top: 5px;
+        font-weight: 500;
+      }
+
+      .step.prepare {
+        background: var(--blue-pale);
+        color: #1d4ed8;
+      }
+
+      .step.build {
+        background: var(--amber-pale);
+        color: #92400e;
+      }
+
+      .step.review {
+        background: #ede9fe;
+        color: #6d28d9;
+      }
+
+      .step.publish {
+        background: var(--green-pale);
+        color: #166534;
+      }
+
+      .arrow {
+        color: #8290a6;
+        font-size: 1.25rem;
+        text-align: center;
+      }
+
+      .one-time-setup {
+        background: linear-gradient(90deg, #ffffff 0%, #ffffff 68%, #f5f8fe 100%);
+      }
+
+      .setup-sequence {
+        display: grid;
+        gap: 28px;
+        margin-top: 28px;
+      }
+
+      .setup-step {
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .setup-step:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+      }
+
+      .one-time-setup .terminal {
+        border-left: 4px solid var(--blue);
+      }
+
+      .setup-copy {
+        max-width: 800px;
+        margin: 18px 0 0 20px;
+        padding-left: 20px;
+        border-left: 2px solid #c9d8ee;
+      }
+
+      .setup-copy p {
+        margin: 12px 0 0;
+        color: var(--muted);
+      }
+
+      .setup-copy p:first-child {
+        margin-top: 0;
+      }
+
+      .command-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 18px;
+      }
+
+      .command-card {
+        padding: 24px;
+        background: #f8faff;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
+
+      .command-card p {
+        margin: 14px 0 0;
+        color: var(--muted);
+      }
+
+      code {
+        display: inline-block;
+        max-width: 100%;
+        padding: 0.15em 0.42em;
+        overflow-wrap: anywhere;
+        color: var(--code);
+        background: #eaf0f8;
+        border-radius: 3px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.9em;
+      }
+
+      .terminal {
+        overflow: hidden;
+        color: #e7eef9;
+        background: #12223a;
+        border: 1px solid #243b5d;
+        border-radius: 6px;
+      }
+
+      .terminal-title {
+        padding: 11px 18px;
+        color: #b6c7df;
+        background: #1b3152;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .terminal pre {
+        margin: 0;
+        padding: 22px 24px;
+        overflow-x: auto;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.88rem;
+        line-height: 1.8;
+      }
+
+      .prompt {
+        color: #86efac;
+      }
+
+      .comment {
+        color: #94a3b8;
+      }
+
+      .note {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border-left: 4px solid var(--blue-dark);
+        color: #244675;
+        background: var(--blue-pale);
+        border-radius: 0 4px 4px 0;
+      }
+
+      .warning {
+        padding: 40px 52px 44px;
+        color: #7f3131;
+        background: var(--red-pale);
+        border: 1px solid #fecaca;
+        border-radius: 0 0 8px 8px;
+      }
+
+      .warning::before {
+        background: var(--red);
+      }
+
+      .warning h2 {
+        font-size: 1.25rem;
+      }
+
+      .development-flow {
+        margin: 30px 0;
+        padding: 26px;
+        background: #f7f9fd;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+
+      .development-flow svg {
+        display: block;
+        width: 100%;
+        min-width: 780px;
+        height: auto;
+      }
+
+      .flow-main,
+      .flow-feature {
+        fill: none;
+        stroke-linecap: round;
+        stroke-width: 6;
+      }
+
+      .flow-main {
+        stroke: var(--blue);
+      }
+
+      .flow-feature {
+        stroke: #f59e0b;
+      }
+
+      .flow-merge {
+        fill: none;
+        stroke: var(--green);
+        stroke-linecap: round;
+        stroke-width: 6;
+      }
+
+      .flow-node {
+        stroke: white;
+        stroke-width: 5;
+      }
+
+      .flow-node-main {
+        fill: var(--blue);
+      }
+
+      .flow-node-feature {
+        fill: var(--amber);
+      }
+
+      .flow-node-merge {
+        fill: var(--green);
+      }
+
+      .flow-label {
+        fill: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .flow-caption {
+        fill: var(--muted);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-size: 13px;
+      }
+
+      .flow-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 18px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .flow-key {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .flow-swatch {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .flow-swatch.main {
+        background: var(--blue);
+      }
+
+      .flow-swatch.feature {
+        background: var(--amber);
+      }
+
+      .flow-swatch.merge {
+        background: var(--green);
+      }
+
+      .table-wrap {
+        margin: 26px 0 0;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 700px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 16px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--blue-dark);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+      }
+
+      td:first-child {
+        width: 42%;
+      }
+
+      @media (max-width: 720px) {
+        main {
+          width: min(100% - 24px, 1120px);
+          margin: 24px auto 44px;
+        }
+
+        header,
+        section {
+          padding: 32px 24px;
+        }
+
+        header {
+          border-radius: 6px 6px 0 0;
+        }
+
+        section::before {
+          top: 34px;
+          height: 28px;
+        }
+
+        .workflow {
+          grid-template-columns: 1fr;
+          gap: 7px;
+        }
+
+        .setup-sequence {
+          gap: 24px;
+          margin-top: 24px;
+        }
+
+        .setup-step {
+          padding-bottom: 24px;
+        }
+
+        .setup-copy {
+          margin-left: 12px;
+          padding-left: 16px;
+        }
+
+        .arrow {
+          transform: rotate(90deg);
+          line-height: 0.5;
+        }
+
+        .warning {
+          padding: 32px 24px;
+          border-radius: 0 0 6px 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Feature delivery reference</p>
+        <h1>Git commands for a safe feature workflow</h1>
+        <p>
+          A visual companion to the Planner - Dev - Reviewer process. Follow
+          the flow from a current <code>main</code> branch to a reviewed pull
+          request, then return to an updated <code>main</code>.
+        </p>
+      </header>
+
+      <section class="feature-delivery">
+        <h2>The delivery flow</h2>
+        <p class="intro">
+          Complete one roadmap feature at a time. A dependent feature starts
+          only after its prerequisite is merged and local <code>main</code> is
+          current.
+        </p>
+        <div class="workflow" aria-label="Feature delivery workflow">
+          <div class="step prepare">1. Prepare<small>Update main</small></div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="step build">2. Build<small>Feature branch</small></div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="step review">3. Review<small>Check the diff</small></div>
+        </div>
+        <div class="workflow" aria-hidden="true">
+          <div class="step publish">4. Publish<small>Open a pull request</small></div>
+          <div class="arrow">→</div>
+          <div class="step publish">5. Merge<small>Approved PR</small></div>
+          <div class="arrow">→</div>
+          <div class="step prepare">6. Repeat<small>Update main</small></div>
+        </div>
+      </section>
+
+      <section class="one-time-setup">
+        <h2>One-time setup</h2>
+        <div class="setup-sequence">
+          <article class="setup-step">
+            <div class="terminal">
+              <div class="terminal-title">Configure repository hooks</div>
+              <pre><span class="comment"># Use this repository's hook scripts, including the protected-branch guard.</span>
+<span class="prompt">$</span> git config core.hooksPath .githooks</pre>
+            </div>
+            <div class="setup-copy">
+            <p>
+              Tells Git to look for this repository's hook scripts in
+              <code>.githooks/</code> instead of Git's default
+              <code>.git/hooks/</code> directory.
+            </p>
+            <p>
+              When you run <code>git commit</code>, Git executes the
+              <code>pre-commit</code> hook from that folder. Here, that hook
+              prevents commits on protected branches such as
+              <code>main</code>.
+            </p>
+            <p>
+              The setting is stored locally in this clone, so each developer
+              must run it once after cloning. Confirm it with
+              <code>git config --get core.hooksPath</code>; it should print
+              <code>.githooks</code>.
+            </p>
+            </div>
+          </article>
+          <article class="setup-step">
+            <div class="terminal">
+              <div class="terminal-title">Verify the guard hook</div>
+              <pre><span class="comment"># Confirm that the Copilot guard hook is configured correctly.</span>
+<span class="prompt">$</span> node .github/hooks/guard.test.cjs</pre>
+            </div>
+            <div class="setup-copy">
+              <p>Verifies that the Copilot guard hook is configured correctly.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <h2>1. Prepare the starting point</h2>
+        <p class="intro">Check your worktree, update remote references, then bring local <code>main</code> forward without a merge commit.</p>
+        <div class="terminal">
+          <div class="terminal-title">Terminal</div>
+          <pre><span class="comment"># 1. See the active branch, its remote tracking status, and changed files.</span>
+<span class="prompt">$</span> git status --short --branch
+
+<span class="comment"># 2. Download the latest remote branch references without modifying files.</span>
+<span class="prompt">$</span> git fetch origin
+
+<span class="comment"># 3. Return to the integration branch before creating the feature branch.</span>
+<span class="prompt">$</span> git switch main
+
+<span class="comment"># 4. Fast-forward local main to origin/main; stop if a merge would be needed.</span>
+<span class="prompt">$</span> git pull --ff-only origin main
+
+<span class="comment"># 5. Confirm that main, not a feature branch, is currently checked out.</span>
+<span class="prompt">$</span> git branch --show-current</pre>
+        </div>
+        <div class="note"><strong>Why this order matters:</strong> check for work that could be affected before switching branches, refresh your view of the remote, then create the feature branch from the latest <code>main</code>. Begin with no uncommitted changes, except for the roadmap file when the workflow permits it.</div>
+      </section>
+
+      <section>
+        <h2>2. Create the feature branch</h2>
+        <p class="intro">Replace <code>&lt;branch&gt;</code> with the branch declared for the selected roadmap feature, for example <code>feat/budget-dashboard</code>.</p>
+        <div class="development-flow">
+          <svg viewBox="0 0 980 310" role="img" aria-label="Branch creation flow: an updated main branch is used to create or resume a feature branch, then the active branch is confirmed">
+            <path class="flow-main" d="M 180 78 H 800" />
+            <path class="flow-feature" d="M 420 78 C 465 78 470 210 520 210 H 780" />
+
+            <text class="flow-label" x="30" y="82">main</text>
+            <text class="flow-caption" x="30" y="104">updated starting point</text>
+            <text class="flow-label" x="30" y="214">feat/your-feature</text>
+            <text class="flow-caption" x="30" y="236">new or resumed branch</text>
+
+            <circle class="flow-node flow-node-main" cx="280" cy="78" r="13" />
+            <text class="flow-caption" x="234" y="44">main is current</text>
+
+            <circle class="flow-node flow-node-main" cx="420" cy="78" r="13" />
+            <text class="flow-caption" x="346" y="44">git switch -c &lt;branch&gt;</text>
+
+            <circle class="flow-node flow-node-feature" cx="550" cy="210" r="13" />
+            <text class="flow-caption" x="498" y="256">branch created</text>
+            <text class="flow-caption" x="484" y="274">or git switch &lt;branch&gt;</text>
+
+            <circle class="flow-node flow-node-feature" cx="740" cy="210" r="13" />
+            <text class="flow-caption" x="665" y="256">confirm active branch</text>
+            <text class="flow-caption" x="670" y="274">git branch --show-current</text>
+
+            <text class="flow-caption" x="464" y="150">both commands leave you on the feature branch</text>
+          </svg>
+          <div class="flow-legend" aria-label="Branch creation flow legend">
+            <span class="flow-key"><span class="flow-swatch main"></span>Main: current base for a new branch</span>
+            <span class="flow-key"><span class="flow-swatch feature"></span>Feature: active branch ready for implementation</span>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-title">Create or resume a branch</div>
+          <pre><span class="comment"># Create a new branch from the current main branch and switch to it.</span>
+<span class="prompt">$</span> git switch -c &lt;branch&gt;
+
+<span class="comment"># Or, resume an existing feature branch without creating another one.</span>
+<span class="prompt">$</span> git switch &lt;branch&gt;
+
+<span class="comment"># Confirm that your edits will happen on the roadmap branch, not main.</span>
+<span class="prompt">$</span> git branch --show-current</pre>
+        </div>
+        <div class="note"><strong>Branch names:</strong> use <code>feat/</code>, <code>fix/</code>, <code>refactor/</code>, or <code>chore/</code>, followed by a kebab-case slug of at most 40 characters.</div>
+      </section>
+
+      <section>
+        <h2>3. Implement and inspect the feature</h2>
+        <p class="intro">The feature branch advances while <code>main</code> remains stable. Each completed roadmap step becomes a focused Conventional Commit.</p>
+        <div class="development-flow">
+          <svg viewBox="0 0 980 310" role="img" aria-label="Implementation flow: main remains unchanged while a feature branch receives edits, diff inspection, focused commits, and review">
+            <path class="flow-main" d="M 180 78 H 830" />
+            <path class="flow-feature" d="M 230 210 H 800" />
+
+            <text class="flow-label" x="30" y="82">main</text>
+            <text class="flow-caption" x="30" y="104">unchanged while you work</text>
+            <text class="flow-label" x="30" y="214">feat/your-feature</text>
+            <text class="flow-caption" x="30" y="236">all implementation happens here</text>
+
+            <circle class="flow-node flow-node-main" cx="280" cy="78" r="13" />
+            <text class="flow-caption" x="238" y="44">stable base</text>
+
+            <circle class="flow-node flow-node-feature" cx="280" cy="210" r="13" />
+            <text class="flow-caption" x="237" y="256">edit files</text>
+
+            <circle class="flow-node flow-node-feature" cx="440" cy="210" r="13" />
+            <text class="flow-caption" x="388" y="256">inspect changes</text>
+            <text class="flow-caption" x="395" y="274">status and diff</text>
+
+            <circle class="flow-node flow-node-feature" cx="600" cy="210" r="13" />
+            <text class="flow-caption" x="550" y="256">stage and commit</text>
+            <text class="flow-caption" x="545" y="274">one roadmap step</text>
+
+            <circle class="flow-node flow-node-feature" cx="760" cy="210" r="13" />
+            <text class="flow-caption" x="715" y="256">review feature</text>
+            <text class="flow-caption" x="714" y="274">diff against main</text>
+
+            <text class="flow-caption" x="472" y="150">keep main safe from in-progress work</text>
+          </svg>
+          <div class="flow-legend" aria-label="Development flow legend">
+            <span class="flow-key"><span class="flow-swatch main"></span>Main: stable integration</span>
+            <span class="flow-key"><span class="flow-swatch feature"></span>Feature: commits and inspection</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Command</th><th>Why use it</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>git status --short</code></td><td>Check precisely which files will be in the next commit.</td></tr>
+              <tr><td><code>git diff</code></td><td>Review unstaged changes before staging.</td></tr>
+              <tr><td><code>git diff --staged</code></td><td>Review exactly what will be committed.</td></tr>
+              <tr><td><code>git add &lt;path&gt;...</code></td><td>Stage only files belonging to the completed roadmap step. Avoid <code>git add .</code> unless every change is intentional.</td></tr>
+              <tr><td><code>git commit -m "type(scope): summary"</code></td><td>Create one Conventional Commit for the roadmap step.</td></tr>
+              <tr><td><code>git log main..HEAD --oneline</code></td><td>List commits delivered by the current feature branch.</td></tr>
+              <tr><td><code>git diff main...HEAD</code></td><td>Inspect the complete feature diff before review.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note"><strong>Common types:</strong> <code>feat</code>, <code>fix</code>, <code>refactor</code>, <code>chore</code>, <code>test</code>, and <code>docs</code>.</div>
+      </section>
+
+      <section>
+        <h2>4. Publish and merge the reviewed feature</h2>
+        <p class="intro">Only continue after the feature has passed its checks and Reviewer review.</p>
+        <div class="development-flow">
+          <svg viewBox="0 0 980 310" role="img" aria-label="Publishing flow: a reviewed feature branch is pushed, opened as a pull request, approved, merged into main, and synchronized locally">
+            <path class="flow-main" d="M 180 78 H 850" />
+            <path class="flow-feature" d="M 230 210 H 680" />
+            <path class="flow-merge" d="M 680 210 C 730 210 735 78 790 78" />
+
+            <text class="flow-label" x="30" y="82">main</text>
+            <text class="flow-caption" x="30" y="104">approved work returns here</text>
+            <text class="flow-label" x="30" y="214">feat/your-feature</text>
+            <text class="flow-caption" x="30" y="236">reviewed and ready to publish</text>
+
+            <circle class="flow-node flow-node-feature" cx="300" cy="210" r="13" />
+            <text class="flow-caption" x="260" y="256">git push</text>
+
+            <circle class="flow-node flow-node-feature" cx="475" cy="210" r="13" />
+            <text class="flow-caption" x="415" y="256">open pull request</text>
+            <text class="flow-caption" x="433" y="274">gh pr create</text>
+
+            <circle class="flow-node flow-node-feature" cx="640" cy="210" r="13" />
+            <text class="flow-caption" x="605" y="256">approved</text>
+
+            <circle class="flow-node flow-node-merge" cx="790" cy="78" r="15" />
+            <text class="flow-caption" x="744" y="44">merge PR</text>
+
+            <circle class="flow-node flow-node-main" cx="860" cy="78" r="13" />
+            <text class="flow-caption" x="817" y="122">update local main</text>
+          </svg>
+          <div class="flow-legend" aria-label="Publishing flow legend">
+            <span class="flow-key"><span class="flow-swatch feature"></span>Feature: publish and request review</span>
+            <span class="flow-key"><span class="flow-swatch merge"></span>Green: approved pull-request merge</span>
+            <span class="flow-key"><span class="flow-swatch main"></span>Main: synchronized for the next feature</span>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-title">Publish, review, merge, and synchronize</div>
+          <pre><span class="comment"># First push: publish the branch and remember its upstream on origin.</span>
+<span class="prompt">$</span> git push -u origin &lt;branch&gt;
+
+<span class="comment"># Later pushes: send new commits to that remembered upstream branch.</span>
+<span class="prompt">$</span> git push
+
+<span class="comment"># Create a PR into main and prefill its title and description from commits.</span>
+<span class="prompt">$</span> gh pr create --base main --head &lt;branch&gt; --fill
+
+<span class="comment"># Open the current branch's PR in a browser to inspect it before merging.</span>
+<span class="prompt">$</span> gh pr view --web
+
+<span class="comment"># Merge the approved PR with a merge commit and remove the remote branch.</span>
+<span class="prompt">$</span> gh pr merge --merge --delete-branch
+
+<span class="comment"># Return to main and download the merged work before the next feature.</span>
+<span class="prompt">$</span> git switch main && git pull --ff-only origin main</pre>
+        </div>
+        <div class="note"><strong>Before submitting:</strong> review the title and body that <code>gh pr create --fill</code> generates from the commit history.</div>
+      </section>
+
+      <section class="warning">
+        <h2>Commands intentionally not run by agents</h2>
+        <p>Agents do not run <code>git push</code>, <code>git merge</code>, <code>git rebase</code>, <code>git reset</code>, <code>git checkout</code>, branch-deletion commands, or database migrations. These operations can rewrite history, remove work, or change the integration branch. Use the reviewed pull-request workflow instead.</p>
+        <p>Do not commit application code directly on <code>main</code>, <code>master</code>, <code>develop</code>, or <code>production</code>.</p>
+      </section>
+    </main>
+  </body>
+</html>
