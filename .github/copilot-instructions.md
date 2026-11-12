@@ -6,10 +6,6 @@ Full-stack web application built and maintained by a solo developer. Priorities:
 - Next.js (App Router), strict TypeScript, TailwindCSS, shadcn/ui
 - Drizzle ORM
 
-## Commands (replace `pnpm` if you use another package manager)
-- `pnpm dev` · `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build`
-- `pnpm drizzle-kit generate` creates migrations. Migrations are applied by the user, never by an agent.
-
 ## Code conventions
 - Server Components by default; add `"use client"` only for state, effects or browser events.
 - Mutations go through Server Actions or Route Handlers; validate every input with Zod.
@@ -20,6 +16,9 @@ Full-stack web application built and maintained by a solo developer. Priorities:
 ## Language
 - Code, identifiers, commit messages, plans and documentation: **English**.
 - Chat replies to the user: **French**.
+
+## Design system
+- The design system is described in `docs/specs/DESIGN_SYSTEM_geist.md`, read the file before creating or modifying UI components.
 
 ## Agent workflow (one roadmap, one feature at a time)
 1. `Planner` creates one complete app roadmap in `docs/plans/<slug>.md`, split into ordered, independently deliverable features (dependencies, acceptance criteria and a branch name for each).
