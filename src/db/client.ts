@@ -1,5 +1,3 @@
-import "server-only";
-
 import { mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";

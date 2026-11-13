@@ -1,5 +1,3 @@
-import "server-only";
-
 import { db, sqlite } from "@/db/client";
 
 /**

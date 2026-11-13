@@ -1,5 +1,3 @@
-import "server-only";
-
 import { db } from "@/db/client";
 import { projectTypes } from "@/db/schema";
 
