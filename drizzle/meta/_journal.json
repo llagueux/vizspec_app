@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794538848589,
+      "tag": "0000_steep_vindicator",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794539082641,
+      "tag": "0001_charming_imperial_guard",
+      "breakpoints": true
+    }
+  ]
+}
