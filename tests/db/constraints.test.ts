@@ -67,6 +67,12 @@ describe("initial schema constraints", () => {
     expect(() => insertStep(sqlite, "step-2", "ticket-1", "project-1", 1, "APP-1.2")).toThrow(
       /step number must be the next ticket number/,
     );
+    expect(() => sqlite.prepare("UPDATE tickets SET number = 2 WHERE id = 'ticket-1'").run()).toThrow(
+      /ticket number and project are immutable/,
+    );
+    expect(() => sqlite.prepare("UPDATE steps SET number = 2 WHERE id = 'step-1'").run()).toThrow(
+      /step number, ticket, and project are immutable/,
+    );
 
     sqlite
       .prepare(

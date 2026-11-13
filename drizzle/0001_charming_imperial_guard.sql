@@ -9,7 +9,6 @@ CREATE TABLE `__new_app_settings` (
 INSERT INTO `__new_app_settings`("key", "value", "updated_at") SELECT "key", "value", "updated_at" FROM `app_settings`;--> statement-breakpoint
 DROP TABLE `app_settings`;--> statement-breakpoint
 ALTER TABLE `__new_app_settings` RENAME TO `app_settings`;--> statement-breakpoint
-PRAGMA foreign_keys=ON;--> statement-breakpoint
 CREATE TABLE `__new_events` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`project_id` text NOT NULL,
@@ -111,4 +110,16 @@ BEGIN
   UPDATE `tickets`
   SET `next_step_number` = NEW.`number` + 1
   WHERE `id` = NEW.`ticket_id`;
-END;
+END;--> statement-breakpoint
+CREATE TRIGGER `tickets_number_immutable`
+BEFORE UPDATE OF `number`, `project_id` ON `tickets`
+BEGIN
+  SELECT RAISE(ABORT, 'ticket number and project are immutable');
+END;--> statement-breakpoint
+CREATE TRIGGER `steps_number_immutable`
+BEFORE UPDATE OF `number`, `ticket_id`, `project_id` ON `steps`
+BEGIN
+  SELECT RAISE(ABORT, 'step number, ticket, and project are immutable');
+END;--> statement-breakpoint
+PRAGMA foreign_keys=ON;--> statement-breakpoint
+PRAGMA foreign_key_check;
