@@ -7,18 +7,18 @@ const drizzleDirectory = resolve(process.cwd(), "drizzle");
 const journal = JSON.parse(readFileSync(resolve(drizzleDirectory, "meta/_journal.json"), "utf8")) as {
   entries: Array<{ tag: string }>;
 };
-const migrationPath = resolve(drizzleDirectory, `${journal.entries[0]?.tag ?? ""}.sql`);
-
 export function createMigratedDatabase() {
   const directory = mkdtempSync(join(tmpdir(), "plan-agentique-db-"));
   const path = join(directory, "plan.db");
   const sqlite = new Database(path);
   sqlite.pragma("foreign_keys = ON");
 
-  const migration = readFileSync(migrationPath, "utf8");
-  for (const statement of migration.split("--> statement-breakpoint")) {
-    if (statement.trim()) {
-      sqlite.exec(statement);
+  for (const { tag } of journal.entries) {
+    const migration = readFileSync(resolve(drizzleDirectory, `${tag}.sql`), "utf8");
+    for (const statement of migration.split("--> statement-breakpoint")) {
+      if (statement.trim()) {
+        sqlite.exec(statement);
+      }
     }
   }
 

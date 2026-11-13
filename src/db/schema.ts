@@ -20,7 +20,10 @@ export const projectTypes = sqliteTable("project_types", {
   description: text().notNull(),
   defaultChecks: text("default_checks").notNull(),
   defaultStepTitles: text("default_step_titles").notNull(),
-});
+}, (table) => [
+  check("project_types_default_checks_json_ck", sql`json_valid(${table.defaultChecks})`),
+  check("project_types_default_step_titles_json_ck", sql`json_valid(${table.defaultStepTitles})`),
+]);
 
 export const projects = sqliteTable(
   "projects",
@@ -53,6 +56,10 @@ export const projects = sqliteTable(
         and ${table.key} not glob '*[^A-Z0-9]*'`,
     ),
     check("projects_auto_export_boolean_ck", sql`${table.autoExport} in (0, 1)`),
+    check(
+      "projects_worktree_roots_json_ck",
+      sql`${table.worktreeRoots} is null or json_valid(${table.worktreeRoots})`,
+    ),
   ],
 );
 
@@ -269,11 +276,18 @@ export const events = sqliteTable(
     payload: text().notNull(),
     createdAt: timestampMs("created_at"),
   },
-  (table) => [index("events_project_id_id_idx").on(table.projectId, table.id)],
+  (table) => [
+    index("events_project_id_id_idx").on(table.projectId, table.id),
+    check("events_payload_json_ck", sql`json_valid(${table.payload})`),
+  ],
 );
 
-export const appSettings = sqliteTable("app_settings", {
-  key: text().primaryKey(),
-  value: text().notNull(),
-  updatedAt: timestampMs("updated_at"),
-});
+export const appSettings = sqliteTable(
+  "app_settings",
+  {
+    key: text().primaryKey(),
+    value: text().notNull(),
+    updatedAt: timestampMs("updated_at"),
+  },
+  (table) => [check("app_settings_value_json_ck", sql`json_valid(${table.value})`)],
+);
